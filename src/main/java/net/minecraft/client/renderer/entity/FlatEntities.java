@@ -6,11 +6,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid="flatentities", name="Flat Entities", version="1.0")
+@Mod("flatentities")
 @EventBusSubscriber
 public class FlatEntities //the class is in a minecraft package so accessing RenderLivingBase's protected fields/methods is possible
 {
@@ -30,7 +30,7 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 		GlStateManager.pushMatrix();
 		GlStateManager.disableCull();
 		renderer.mainModel.swingProgress = renderer.getSwingProgress(entity, partialTicks);
-		boolean shouldSit = entity.isRiding() && (entity.getRidingEntity() != null && entity.getRidingEntity().shouldRiderSit());
+		boolean shouldSit = entity.isPassenger() && (entity.getRidingEntity() != null && entity.getRidingEntity().shouldRiderSit());
 		renderer.mainModel.isRiding = shouldSit;
 		renderer.mainModel.isChild = entity.isChild();
 
@@ -71,7 +71,7 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 
 			prepareFlatRender(x, z, f);
 
-			if(!entity.isRiding())
+			if(!entity.isPassenger())
 			{
 				f5 = entity.prevLimbSwingAmount + (entity.limbSwingAmount - entity.prevLimbSwingAmount) * partialTicks;
 				f6 = entity.limbSwing - entity.limbSwingAmount * (1.0F - partialTicks);
@@ -81,11 +81,9 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 
 				if(f5 > 1.0F)
 					f5 = 1.0F;
-				f2 = f1 - f; // Forge: Fix MC-1207
-
 			}
 
-			GlStateManager.enableAlpha();
+			GlStateManager.enableAlphaTest();
 			renderer.mainModel.setLivingAnimations(entity, f6, f5, partialTicks);
 			renderer.mainModel.setRotationAngles(f6, f5, f8, f2, f7, f4, entity);
 
@@ -125,9 +123,9 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 		}
 		catch (Exception exception) {}
 
-		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+		GlStateManager.activeTexture(OpenGlHelper.GL_TEXTURE1);
 		GlStateManager.enableTexture2D();
-		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+		GlStateManager.activeTexture(OpenGlHelper.GL_TEXTURE0);
 		GlStateManager.enableCull();
 		GlStateManager.popMatrix();
 
@@ -145,8 +143,8 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 		double angle1 = Math.atan2(z, x) / 3.141592653589793D * 180.0D;
 		double angle2 = Math.floor((f - angle1) / 45.0D) * 45.0D;
 
-		GlStateManager.rotate((float)angle1, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.02F, 1.0F, 1.0F);
-		GlStateManager.rotate((float)angle2, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotatef((float)angle1, 0.0F, 1.0F, 0.0F);
+		GlStateManager.scalef(0.02F, 1.0F, 1.0F);
+		GlStateManager.rotatef((float)angle2, 0.0F, 1.0F, 0.0F);
 	}
 }

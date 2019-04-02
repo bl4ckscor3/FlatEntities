@@ -1,0 +1,25 @@
+modLoader="javafml" #mandatory
+loaderVersion="[25,)" #mandatory
+issueTrackerURL="https://github.com/bl4ckscor3/FlatEntities/issues"
+displayURL="http://minecraft.curseforge.com/projects/flat-entities"
+authors="bl4ckscor3"
+
+[[mods]] #mandatory
+modId="flatentities" #mandatory
+version="v1.0.1" #mandatory
+displayName="Flat Entities" #mandatory
+description='''Renders living entities in 2D, just like in Mojang's 2019 April Fools' joke!''' #mandatory
+
+[[dependencies.flatentities]]
+    modId="forge"
+    mandatory=true
+    versionRange="[25,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.flatentities]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.13.2]"
+    ordering="NONE"
+    side="BOTH"
