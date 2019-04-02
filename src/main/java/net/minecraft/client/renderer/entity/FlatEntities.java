@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid="flatentities", name="Flat Entities", version="1.0")
+@Mod(modid="flatentities", name="Flat Entities", version="1.0.1")
 @EventBusSubscriber
 public class FlatEntities //the class is in a minecraft package so accessing RenderLivingBase's protected fields/methods is possible
 {
@@ -123,7 +123,7 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 
 			GlStateManager.disableRescaleNormal();
 		}
-		catch (Exception exception) {}
+		catch(Exception exception) {}
 
 		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
 		GlStateManager.enableTexture2D();
