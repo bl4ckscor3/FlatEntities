@@ -1,9 +1,10 @@
 package net.minecraft.client.renderer.entity;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.platform.GlStateManager;
+
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -15,10 +16,10 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 public class FlatEntities //the class is in a minecraft package so accessing RenderLivingBase's protected fields/methods is possible
 {
 	@SubscribeEvent
-	public static void onRenderLivingPre(RenderLivingEvent.Pre<EntityLivingBase> event)
+	public static void onRenderLivingPre(RenderLivingEvent.Pre<LivingEntity,EntityModel<LivingEntity>> event)
 	{
-		EntityLivingBase entity = event.getEntity();
-		RenderLivingBase<EntityLivingBase> renderer = event.getRenderer();
+		LivingEntity entity = event.getEntity();
+		LivingRenderer<LivingEntity,EntityModel<LivingEntity>> renderer = event.getRenderer();
 		float partialTicks = event.getPartialRenderTick();
 		double x = event.getX();
 		double y = event.getY();
@@ -29,21 +30,21 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 		//vanilla code
 		GlStateManager.pushMatrix();
 		GlStateManager.disableCull();
-		renderer.mainModel.swingProgress = renderer.getSwingProgress(entity, partialTicks);
+		renderer.field_77045_g.field_217112_c = renderer.getSwingProgress(entity, partialTicks);
 		boolean shouldSit = entity.isPassenger() && (entity.getRidingEntity() != null && entity.getRidingEntity().shouldRiderSit());
-		renderer.mainModel.isRiding = shouldSit;
-		renderer.mainModel.isChild = entity.isChild();
+		renderer.field_77045_g.field_217113_d = shouldSit;
+		renderer.field_77045_g.isChild = entity.isChild();
 
 		try
 		{
-			float f = renderer.interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
-			float f1 = renderer.interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
+			float f = MathHelper.func_219805_h(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
+			float f1 = MathHelper.func_219805_h(partialTicks, entity.prevRotationYawHead, entity.rotationYawHead);
 			float f2 = f1 - f;
 
-			if(shouldSit && entity.getRidingEntity() instanceof EntityLivingBase)
+			if(shouldSit && entity.getRidingEntity() instanceof LivingEntity)
 			{
-				EntityLivingBase entitylivingbase = (EntityLivingBase)entity.getRidingEntity();
-				f = renderer.interpolateRotation(entitylivingbase.prevRenderYawOffset, entitylivingbase.renderYawOffset, partialTicks);
+				LivingEntity livingentity = (LivingEntity)entity.getRidingEntity();
+				f = MathHelper.func_219805_h(partialTicks, livingentity.prevRenderYawOffset, livingentity.renderYawOffset);
 				f2 = f1 - f;
 				float f3 = MathHelper.wrapDegrees(f2);
 
@@ -61,7 +62,7 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 				f2 = f1 - f;
 			}
 
-			float f7 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
+			float f7 = MathHelper.func_219799_g(partialTicks, entity.prevRotationPitch, entity.rotationPitch);
 			renderer.renderLivingAt(entity, x, y, z);
 			float f8 = renderer.handleRotationFloat(entity, partialTicks);
 			renderer.applyRotations(entity, f8, f, partialTicks);
@@ -71,9 +72,9 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 
 			prepareFlatRender(x, z, f);
 
-			if(!entity.isPassenger())
+			if(!entity.isPassenger() && entity.isAlive())
 			{
-				f5 = entity.prevLimbSwingAmount + (entity.limbSwingAmount - entity.prevLimbSwingAmount) * partialTicks;
+				f5 = MathHelper.func_219799_g(partialTicks, entity.prevLimbSwingAmount, entity.limbSwingAmount);
 				f6 = entity.limbSwing - entity.limbSwingAmount * (1.0F - partialTicks);
 
 				if(entity.isChild())
@@ -84,22 +85,22 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 			}
 
 			GlStateManager.enableAlphaTest();
-			renderer.mainModel.setLivingAnimations(entity, f6, f5, partialTicks);
-			renderer.mainModel.setRotationAngles(f6, f5, f8, f2, f7, f4, entity);
+			renderer.field_77045_g.setLivingAnimations(entity, f6, f5, partialTicks);
+			renderer.field_77045_g.setRotationAngles(entity, f6, f5, f8, f2, f7, f4);
 
 			if(renderer.renderOutlines)
 			{
 				boolean flag1 = renderer.setScoreTeamColor(entity);
 				GlStateManager.enableColorMaterial();
-				GlStateManager.enableOutlineMode(renderer.getTeamColor(entity));
+				GlStateManager.setupSolidRenderingTextureCombine(renderer.getTeamColor(entity));
 
 				if(!renderer.renderMarker)
 					renderer.renderModel(entity, f6, f5, f8, f2, f7, f4);
 
-				if(!(entity instanceof EntityPlayer) || !((EntityPlayer)entity).isSpectator())
+				if(!entity.isSpectator())
 					renderer.renderLayers(entity, f6, f5, partialTicks, f8, f2, f7, f4);
 
-				GlStateManager.disableOutlineMode();
+				GlStateManager.tearDownSolidRenderingTextureCombine();
 				GlStateManager.disableColorMaterial();
 
 				if(flag1)
@@ -115,17 +116,17 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 
 				GlStateManager.depthMask(true);
 
-				if(!(entity instanceof EntityPlayer) || !((EntityPlayer)entity).isSpectator())
+				if(!entity.isSpectator())
 					renderer.renderLayers(entity, f6, f5, partialTicks, f8, f2, f7, f4);
 			}
 
 			GlStateManager.disableRescaleNormal();
 		}
-		catch (Exception exception) {}
+		catch(Exception exception) {}
 
-		GlStateManager.activeTexture(OpenGlHelper.GL_TEXTURE1);
-		GlStateManager.enableTexture2D();
-		GlStateManager.activeTexture(OpenGlHelper.GL_TEXTURE0);
+		GlStateManager.activeTexture(GLX.GL_TEXTURE1);
+		GlStateManager.enableTexture();
+		GlStateManager.activeTexture(GLX.GL_TEXTURE0);
 		GlStateManager.enableCull();
 		GlStateManager.popMatrix();
 
@@ -135,7 +136,7 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 		//end vanilla code
 
 		//call render post event
-		net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Post<EntityLivingBase>(entity, renderer, partialTicks, x, y, z));
+		net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Post<LivingEntity,EntityModel<LivingEntity>>(entity, renderer, partialTicks, x, y, z));
 	}
 
 	public static void prepareFlatRender(double x, double z, float f)
