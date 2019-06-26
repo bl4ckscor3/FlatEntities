@@ -64,8 +64,8 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 
 			float f7 = MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch);
 			renderer.renderLivingAt(entity, x, y, z);
-			float f8 = renderer.func_77044_a(entity, partialTicks);
-			renderer.func_77043_a(entity, f8, f, partialTicks);
+			float f8 = renderer.handleRotationFloat(entity, partialTicks);
+			renderer.applyRotations(entity, f8, f, partialTicks);
 			float f4 = renderer.prepareScale(entity, partialTicks);
 			float f5 = 0.0F;
 			float f6 = 0.0F;
@@ -85,8 +85,8 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 			}
 
 			GlStateManager.enableAlphaTest();
-			renderer.field_77045_g.func_212843_a_(entity, f6, f5, partialTicks);
-			renderer.field_77045_g.func_212844_a_(entity, f6, f5, f8, f2, f7, f4);
+			renderer.field_77045_g.setLivingAnimations(entity, f6, f5, partialTicks);
+			renderer.field_77045_g.setRotationAngles(entity, f6, f5, f8, f2, f7, f4);
 
 			if(renderer.renderOutlines)
 			{
@@ -132,7 +132,7 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 
 		//from super call
 		if(!renderer.renderOutlines)
-			renderer.func_177067_a(entity, x, y, z);
+			renderer.renderName(entity, x, y, z);
 		//end vanilla code
 
 		//call render post event
