@@ -30,10 +30,10 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 		//vanilla code
 		GlStateManager.pushMatrix();
 		GlStateManager.disableCull();
-		renderer.field_77045_g.swingProgress = renderer.getSwingProgress(entity, partialTicks);
+		renderer.entityModel.swingProgress = renderer.getSwingProgress(entity, partialTicks);
 		boolean shouldSit = entity.isPassenger() && (entity.getRidingEntity() != null && entity.getRidingEntity().shouldRiderSit());
-		renderer.field_77045_g.isSitting = shouldSit;
-		renderer.field_77045_g.isChild = entity.isChild();
+		renderer.entityModel.isSitting = shouldSit;
+		renderer.entityModel.isChild = entity.isChild();
 
 		try
 		{
@@ -85,8 +85,8 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 			}
 
 			GlStateManager.enableAlphaTest();
-			renderer.field_77045_g.setLivingAnimations(entity, f6, f5, partialTicks);
-			renderer.field_77045_g.setRotationAngles(entity, f6, f5, f8, f2, f7, f4);
+			renderer.entityModel.setLivingAnimations(entity, f6, f5, partialTicks);
+			renderer.entityModel.setRotationAngles(entity, f6, f5, f8, f2, f7, f4);
 
 			if(renderer.renderOutlines)
 			{
