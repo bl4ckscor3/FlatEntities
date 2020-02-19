@@ -6,13 +6,14 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @Mod("flatentities")
-@EventBusSubscriber
+@EventBusSubscriber(Dist.CLIENT)
 public class FlatEntities //the class is in a minecraft package so accessing RenderLivingBase's protected fields/methods is possible
 {
 	@SubscribeEvent
@@ -26,7 +27,6 @@ public class FlatEntities //the class is in a minecraft package so accessing Ren
 		double z = event.getZ();
 
 		event.setCanceled(true); //disable normal rendering
-
 		//vanilla code
 		GlStateManager.pushMatrix();
 		GlStateManager.disableCull();
